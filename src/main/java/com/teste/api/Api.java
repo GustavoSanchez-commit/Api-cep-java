@@ -12,20 +12,34 @@ public class Api {
         
         System.out.println("Qual o seu nome?");
         String nome = ler.next();
-        System.out.println("Qual o seu CEP?");
-        String cep = ler.next();
-        
-        ler.close();
-        
-        ApiService apiService = new ApiService();
-        
-        try {
-            EnderecoDto enderecoDto = apiService.getEndereco(cep);
-            System.out.println("Olá, " + nome + " você mora na " + enderecoDto.getLogradouro()+"?");
-        } catch (IOException ex) {
-            throw new RuntimeException();
-        } catch (InterruptedException ex) {
-            throw new RuntimeException();
+
+        while (true) {
+            System.out.println("Qual o seu CEP?");
+            String cep = ler.next();
+
+            ApiService apiService = new ApiService();
+
+            try {
+                EnderecoDto enderecoDto = apiService.getEndereco(cep);
+
+                if (enderecoDto.getLogradouro() == null || enderecoDto.getLogradouro().isEmpty()) {
+                    System.out.println("CEP informado incorreto. Tente novamente.");
+                } else {
+                    System.out.println("Olá, " + nome + ", você mora na " + enderecoDto.getLogradouro() + "? [sim/nao]");
+                    String escolha = ler.next();
+
+                    if (!escolha.equalsIgnoreCase("sim")) {
+                        System.out.println("CEP informado incorreto.");
+                    } else {
+                        System.out.println("CEP confirmado.");
+                        break; // Encerra o loop caso a resposta seja "sim"
+                    }
+                }
+            } catch (IOException | InterruptedException ex) {
+                System.out.println("Erro ao buscar o endereço. Tente novamente.");
+            }
         }
+
+        ler.close(); // Fecha o Scanner para liberar recursos
     }
 }
